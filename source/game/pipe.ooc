@@ -14,9 +14,10 @@ Pipe: abstract class {
 
     logger := static Log getLogger(This name)
 
-    side := static 40
-    // FIXME: kind of arbitrary here
-    holeWidth := static 13
+    side := static 64
+    // Compute these percentages again if you modify the image
+    holeOffset := static side * 0.325 + 0.5
+    holeWidth := static side * 0.35 + 0.5
     angle: Double
     image: ImageAsset
     renderer: SdlRenderer
@@ -37,9 +38,6 @@ Pipe: abstract class {
     }
 
     draw: func(x, y: Int, dt: Double) {
-        container := (x * side, y * side, side, side) as SdlRect
-        SDL renderCopyEx(renderer, image texture, null, container&, angle, null, SDL_FLIP_NONE)
-
         progress: Double = 0
 
         if (current) {
@@ -59,6 +57,10 @@ Pipe: abstract class {
 
         drawWater(x, y, progress)
         SDL setRenderDrawColor(renderer, 255, 255, 255, 255)
+
+        container := (x * side, y * side, side, side) as SdlRect
+        SDL renderCopyEx(renderer, image texture, null, container&, angle, null, SDL_FLIP_NONE)
+
     }
 
     drawWater: abstract func (x, y: Int, progress: Double)
@@ -87,14 +89,14 @@ StraightPipe: class extends Pipe {
             case 0 =>
                 water w *= progress
                 water h = holeWidth
-                water y += holeWidth
+                water y += holeOffset
                 if (flowDirection == Direction left) {
                     water x += side - water w
                 }
             case =>
                 water h *= progress
                 water w = holeWidth
-                water x += holeWidth
+                water x += holeOffset
                 if (flowDirection == Direction up) {
                     water y += side - water h
                 }
@@ -126,7 +128,7 @@ ElbowPipe: class extends Pipe {
 
         SDL setRenderDrawColor(renderer, 0x27, 0x90, 0xff, 255)
 
-        treshold := 0.66
+        treshold := 0.67
 
         progress1 := progress
         if (progress1 > treshold) {
@@ -139,21 +141,21 @@ ElbowPipe: class extends Pipe {
             case Direction up =>
                 water1 w = holeWidth
                 water1 h *= progress1
-                water1 x += holeWidth
+                water1 x += holeOffset
                 water1 y += side - water1 h
             case Direction down =>
                 water1 w = holeWidth
                 water1 h *= progress1
-                water1 x += holeWidth
+                water1 x += holeOffset
             case Direction left =>
                 water1 w *= progress1
                 water1 h = holeWidth
-                water1 y += holeWidth
+                water1 y += holeOffset
                 water1 x += side - water1 w
             case Direction right =>
                 water1 w *= progress1
                 water1 h = holeWidth
-                water1 y += holeWidth
+                water1 y += holeOffset
         }
 
         SDL renderFillRect(renderer, water1&)
@@ -168,23 +170,23 @@ ElbowPipe: class extends Pipe {
             case Direction up =>
                 water2 w = holeWidth
                 water2 h *= progress2
-                water2 x += holeWidth
-                water2 y += 2 * holeWidth - water2 h
+                water2 x += holeOffset
+                water2 y += holeOffset + holeWidth - water2 h
             case Direction down =>
                 water2 w = holeWidth
                 water2 h *= progress2
-                water2 x += holeWidth
-                water2 y += 2 * holeWidth
+                water2 x += holeOffset
+                water2 y += holeOffset + holeWidth
             case Direction left =>
                 water2 w *= progress2
                 water2 h = holeWidth
-                water2 x += 2 * holeWidth - water2 w
-                water2 y += holeWidth
+                water2 x += holeOffset + holeWidth - water2 w
+                water2 y += holeOffset
             case Direction right =>
                 water2 w *= progress2
                 water2 h = holeWidth
-                water2 x += 2 * holeWidth
-                water2 y += holeWidth
+                water2 x += holeOffset + holeWidth
+                water2 y += holeOffset
         }
 
         SDL renderFillRect(renderer, water2&)
