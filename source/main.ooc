@@ -1,10 +1,10 @@
 use sdl2
-use deadlogger
-
 import sdl2/[Core, Event]
+
+use deadlogger
 import deadlogger/[Log, Handler, Level, Formatter, Filter]
 
-import game/[grid, pipe, utils]
+import game/[grid, input, pipe, utils]
 
 main: func (argc: Int, argv: CString*) {
 
@@ -33,7 +33,11 @@ main: func (argc: Int, argv: CString*) {
 
     SDL setRenderDrawColor(renderer, 255, 255, 255, 255)
 
+    input := Input new()
+
     running := true
+
+    input onExit(|| running = false)
 
     framRate: Double = 60
     MAX_FRAME_DURATION := 16.667 // 1000 / 60
@@ -43,13 +47,7 @@ main: func (argc: Int, argv: CString*) {
     t1 := SDL getTicks()
 
     while (running) {
-        e: SdlEvent
-
-        if (SdlEvent poll(e&)) {
-            match (e type) {
-                case SDL_QUIT => running = false
-            }
-        }
+        input poll()
 
         SDL renderClear(renderer)
         grid draw(dt)
