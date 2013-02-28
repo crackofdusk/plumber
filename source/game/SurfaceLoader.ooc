@@ -1,6 +1,6 @@
 use sdl2
 use math
-use stbi
+use stb-image
 
 import sdl2/Core
 import stb/image

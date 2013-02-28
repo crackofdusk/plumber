@@ -1,5 +1,5 @@
 Name: Plumber
 Description: A simple pipe puzzle game
 SourcePath: source
-Requires: gnaar, sdl2, stbi
+Requires: gnaar, sdl2, stb-image
 Main: main.ooc
