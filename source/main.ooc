@@ -4,7 +4,7 @@ import sdl2/[Core, Event]
 use deadlogger
 import deadlogger/[Log, Handler, Level, Formatter, Filter]
 
-import game/[grid, input, pipe, utils]
+import game/[config, grid, input, pipe, player, utils]
 
 main: func (argc: Int, argv: CString*) {
 
@@ -14,10 +14,12 @@ main: func (argc: Int, argv: CString*) {
     SDL init(SDL_INIT_EVERYTHING)
 
     window := SDL createWindow(
-        "YAY!",
+        "Plumber",
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
-        600, 400, SDL_WINDOW_SHOWN)
+        10 * Config side, 10 * Config side, SDL_WINDOW_SHOWN)
+
+    SDL showCursor(false)
 
     renderer := SDL createRenderer(window, -1, SDL_RENDERER_ACCELERATED)
 
@@ -33,6 +35,8 @@ main: func (argc: Int, argv: CString*) {
 
     SDL setRenderDrawColor(renderer, 255, 255, 255, 255)
 
+    player := Player new(renderer)
+
     input := Input new()
 
     running := true
@@ -40,7 +44,8 @@ main: func (argc: Int, argv: CString*) {
     input onExit(|| running = false)
 
     input onMouseMove(|event|
-        logger debug("Mouse moved %d %d" format(event x, event y))
+        player x = event x / Config side
+        player y = event y / Config side
     )
 
     input onMouseRelease(SDL_BUTTON_LEFT, |event|
@@ -48,7 +53,7 @@ main: func (argc: Int, argv: CString*) {
     )
 
     framRate: Double = 60
-    MAX_FRAME_DURATION := 16.667 // 1000 / 60
+    MAX_FRAME_DURATION := 1000 / framRate
 
     dt: Double
 
@@ -59,6 +64,7 @@ main: func (argc: Int, argv: CString*) {
 
         SDL renderClear(renderer)
         grid draw(dt)
+        player draw(dt)
         SDL renderPresent(renderer)
 
         t2 := SDL getTicks()

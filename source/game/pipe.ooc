@@ -14,7 +14,8 @@ Pipe: abstract class {
 
     logger := static Log getLogger(This name)
 
-    side := static 64
+    side := static Config side
+
     // Compute these percentages again if you modify the image
     holeOffset := static side * 0.325 + 0.5
     holeWidth := static side * 0.35 + 0.5
