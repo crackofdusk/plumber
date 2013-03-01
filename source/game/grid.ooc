@@ -82,8 +82,6 @@ Grid: class<T> extends SparseGrid<T> {
 
     each: func (f: Func(Int, Int, T)) {
         rows each (|j, row|
-            // workaround for https://github.com/nddrylliog/rock/issues/571
-            f
             row cols each (|i, value|
                 f(i, j, value)
             )
