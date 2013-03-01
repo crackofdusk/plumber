@@ -39,6 +39,14 @@ main: func (argc: Int, argv: CString*) {
 
     input onExit(|| running = false)
 
+    input onMouseMove(|event|
+        logger debug("Mouse moved %d %d" format(event x, event y))
+    )
+
+    input onMouseRelease(SDL_BUTTON_LEFT, |event|
+        logger debug("Button released %d %d" format(event x, event y))
+    )
+
     framRate: Double = 60
     MAX_FRAME_DURATION := 16.667 // 1000 / 60
 

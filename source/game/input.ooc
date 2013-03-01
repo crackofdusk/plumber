@@ -10,6 +10,9 @@ Input: class {
 
     logger := static Log getLogger(This name)
 
+    _mouseX: Int
+    _mouseY: Int
+
     listeners := ArrayList<Listener> new()
 
     onEvent: func (cb: Func(ListenerEvent)) -> Listener {
@@ -21,23 +24,38 @@ Input: class {
     onExit: func (cb: Func) -> Listener {
         onEvent(|ev|
             match (ev) {
-                // TODO: ask nddrylliog about case names
                 case xv: ExitEvent => cb()
             }
         )
     }
 
-    _mouseReleased: func (button: Int) {
-        logger debug("Mouse button up")
+    onMouseMove: func (cb: Func(MouseMotion)) -> Listener {
+        onEvent(|ev|
+            match (ev) {
+                case mm: MouseMotion => cb(mm)
+            }
+        )
+    }
 
+    onMouseRelease: func (which: UInt, cb: Func(MouseRelease)) -> Listener {
+        onEvent(|ev|
+            match (ev) {
+                case mr: MouseRelease =>
+                    if (mr button == which) cb(mr)
+            }
+        )
+    }
+
+    _mouseReleased: func (button: Int) {
+        _notifyListeners(MouseRelease new(_mouseX, _mouseY, button))
     }
 
     _mouseMoved: func (x, y: Int) {
-        logger debug("Mouse moved")
+        (_mouseX, _mouseY) = (x, y)
+        _notifyListeners(MouseMotion new(x, y))
     }
 
     _quit: func {
-        logger debug("SDL quit event")
         _notifyListeners(ExitEvent new())
     }
 
